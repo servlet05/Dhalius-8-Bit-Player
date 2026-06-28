@@ -277,7 +277,128 @@ searchInput.addEventListener('input', () => {
         if (newIdx > -1) loadTrack(newIdx);
     }
 });
+// ============================================================
+// CART VIEW (reemplaza el visor principal)
+// ============================================================
+const cartView = document.getElementById('cartView');
+const visor = document.getElementById('visor');
+const cartItemsList = document.getElementById('cartItemsList');
+const cartTotalPrice = document.getElementById('cartTotalPrice');
+const cartTotalSection = document.getElementById('cartTotalSection');
+const cartBuyerEmail = document.getElementById('cartBuyerEmail');
+const cartCheckoutBtn = document.getElementById('cartCheckoutBtn');
+const backFromCartBtn = document.getElementById('backFromCartBtn');
 
+// Mostrar la vista del carrito
+function showCartView() {
+    // Ocultar el visor principal (player, spectrogram, etc.)
+    visor.style.display = 'none';
+    // Mostrar la vista del carrito
+    cartView.classList.add('active');
+    // Renderizar el carrito
+    renderCartView();
+}
+
+// Ocultar la vista del carrito y mostrar el visor principal
+function hideCartView() {
+    cartView.classList.remove('active');
+    visor.style.display = 'flex';
+}
+
+// Renderizar el contenido del carrito en la vista
+function renderCartView() {
+    const total = cart.length * PRICE_PER_TRACK;
+
+    if (cart.length === 0) {
+        cartItemsList.innerHTML = '<div class="empty-cart-msg">Your cart is empty. Add some tracks! 🎵</div>';
+        cartTotalSection.style.display = 'none';
+        return;
+    }
+
+    let html = '';
+    cart.forEach((track, i) => {
+        html += `
+            <div class="cart-item-row">
+                <span>${track.name}</span>
+                <span>
+                    $${PRICE_PER_TRACK.toFixed(2)}
+                    <button class="remove-item-btn" data-index="${i}">✕</button>
+                </span>
+            </div>
+        `;
+    });
+    cartItemsList.innerHTML = html;
+
+    cartTotalPrice.textContent = `Total: $${total.toFixed(2)} USD`;
+    cartTotalSection.style.display = 'block';
+
+    // Event listeners para eliminar items
+    document.querySelectorAll('.remove-item-btn').forEach((btn) => {
+        btn.addEventListener('click', (e) => {
+            const idx = parseInt(e.target.dataset.index);
+            const trackToRemove = cart[idx];
+            if (trackToRemove) {
+                cart = cart.filter(t => t.index !== trackToRemove.index);
+                updateCartUI();
+                renderCartView(); // Re-renderizar la vista
+            }
+        });
+    });
+}
+
+// Evento para abrir el carrito desde el botón superior
+cartBtn.addEventListener('click', () => {
+    showCartView();
+});
+
+// Evento para volver al reproductor
+backFromCartBtn.addEventListener('click', () => {
+    hideCartView();
+});
+
+// Evento para el checkout desde la vista del carrito
+cartCheckoutBtn.addEventListener('click', () => {
+    if (cart.length === 0) return;
+
+    const buyerEmail = cartBuyerEmail.value;
+    if (!buyerEmail || !buyerEmail.includes('@')) {
+        alert('Please enter a valid email address.');
+        return;
+    }
+
+    const total = cart.length * PRICE_PER_TRACK;
+    const itemList = cart.map(t => t.name).join('\n');
+
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = 'https://www.paypal.com/cgi-bin/webscr';
+
+    const fields = {
+        cmd: '_xclick',
+        business: 'TU_EMAIL@PAYPAL.COM', // CAMBIA ESTO
+        currency_code: 'USD',
+        amount: total.toFixed(2),
+        item_name: `Dhalius Tracks (${cart.length} tracks)`,
+        item_number: 'Dhalius_CR_' + Date.now(),
+        quantity: '1',
+        return: 'https://tu-sitio.com/gracias',
+        cancel_return: 'https://tu-sitio.com/cancelado',
+        custom: buyerEmail,
+        on0: 'Tracks',
+        os0: itemList
+    };
+
+    for (const [key, value] of Object.entries(fields)) {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = key;
+        input.value = value;
+        form.appendChild(input);
+    }
+
+    document.body.appendChild(form);
+    form.submit();
+});
 // ============================================================
 // 8. VIDEO DROP ZONE
 // ============================================================
