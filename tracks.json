@@ -2178,5 +2178,198 @@
     "spec": "https://archive.org/download/music-made-by-artificial-intelligence/zodiac_spectrogram.png",
     "size": "4.5 MB",
     "duration": "4:20"
+  },
+    // ====== Colección: jamendo-130684 (12 tracks) ======
+  {
+    "name": "Google TV Show",
+    "genre": "Electronica",
+    "mood": "Background",
+    "collection": "jamendo-130684",
+    "url": "https://archive.org/download/jamendo-130684/01-1096025-Dhalius-Google%20TV%20Show.mp3",
+    "spec": "https://archive.org/download/jamendo-130684/01-1096025-Dhalius-Google%20TV%20Show_spectrogram.png",
+    "size": "1.4 MB",
+    "duration": "1:20"
+  },
+  {
+    "name": "Ebay ADN wholesale",
+    "genre": "Electronica",
+    "mood": "Background",
+    "collection": "jamendo-130684",
+    "url": "https://archive.org/download/jamendo-130684/02-1096022-Dhalius-Ebay%20ADN%20wholesale.mp3",
+    "spec": "https://archive.org/download/jamendo-130684/02-1096022-Dhalius-Ebay%20ADN%20wholesale_spectrogram.png",
+    "size": "1.8 MB",
+    "duration": "1:45"
+  },
+  {
+    "name": "Adobe Core",
+    "genre": "Electronica",
+    "mood": "Background",
+    "collection": "jamendo-130684",
+    "url": "https://archive.org/download/jamendo-130684/03-1096023-Dhalius-Adobe%20Core.mp3",
+    "spec": "https://archive.org/download/jamendo-130684/03-1096023-Dhalius-Adobe%20Core_spectrogram.png",
+    "size": "2.2 MB",
+    "duration": "2:10"
+  },
+  {
+    "name": "Snowden Reactor",
+    "genre": "Electronica",
+    "mood": "Background",
+    "collection": "jamendo-130684",
+    "url": "https://archive.org/download/jamendo-130684/04-1096024-Dhalius-Snowden%20Reactor.mp3",
+    "spec": "https://archive.org/download/jamendo-130684/04-1096024-Dhalius-Snowden%20Reactor_spectrogram.png",
+    "size": "2.7 MB",
+    "duration": "2:35"
+  },
+  {
+    "name": "Aaron Swartz City",
+    "genre": "Electronica",
+    "mood": "Background",
+    "collection": "jamendo-130684",
+    "url": "https://archive.org/download/jamendo-130684/05-1096026-Dhalius-Aaron%20Swartz%20City.mp3",
+    "spec": "https://archive.org/download/jamendo-130684/05-1096026-Dhalius-Aaron%20Swartz%20City_spectrogram.png",
+    "size": "1.3 MB",
+    "duration": "1:15"
+  },
+  {
+    "name": "anonymous download",
+    "genre": "Electronica",
+    "mood": "Background",
+    "collection": "jamendo-130684",
+    "url": "https://archive.org/download/jamendo-130684/06-1096027-Dhalius-anonymous%20download.mp3",
+    "spec": "https://archive.org/download/jamendo-130684/06-1096027-Dhalius-anonymous%20download_spectrogram.png",
+    "size": "5.0 MB",
+    "duration": "4:50"
+  },
+  {
+    "name": "The Diaspora",
+    "genre": "Electronica",
+    "mood": "Background",
+    "collection": "jamendo-130684",
+    "url": "https://archive.org/download/jamendo-130684/07-1096031-Dhalius-The%20Diaspora.mp3",
+    "spec": "https://archive.org/download/jamendo-130684/07-1096031-Dhalius-The%20Diaspora_spectrogram.png",
+    "size": "2.4 MB",
+    "duration": "2:20"
+  },
+  {
+    "name": "Foxconn suicide jumper",
+    "genre": "Electronica",
+    "mood": "Background",
+    "collection": "jamendo-130684",
+    "url": "https://archive.org/download/jamendo-130684/08-1096028-Dhalius-Foxconn%20suicide%20jumper.mp3",
+    "spec": "https://archive.org/download/jamendo-130684/08-1096028-Dhalius-Foxconn%20suicide%20jumper_spectrogram.png",
+    "size": "1.0 MB",
+    "duration": "0:58"
+  },
+  {
+    "name": "Wall Street",
+    "genre": "Electronica",
+    "mood": "Background",
+    "collection": "jamendo-130684",
+    "url": "https://archive.org/download/jamendo-130684/09-1096029-Dhalius-Wall%20Street.mp3",
+    "spec": "https://archive.org/download/jamendo-130684/09-1096029-Dhalius-Wall%20Street_spectrogram.png",
+    "size": "1.4 MB",
+    "duration": "1:22"
+  },
+  {
+    "name": "Open Music",
+    "genre": "Electronica",
+    "mood": "Background",
+    "collection": "jamendo-130684",
+    "url": "https://archive.org/download/jamendo-130684/10-1096030-Dhalius-Open%20Music.mp3",
+    "spec": "https://archive.org/download/jamendo-130684/10-1096030-Dhalius-Open%20Music_spectrogram.png",
+    "size": "2.2 MB",
+    "duration": "2:08"
+  },
+  {
+    "name": "Hi Krokodil",
+    "genre": "Electronica",
+    "mood": "Background",
+    "collection": "jamendo-130684",
+    "url": "https://archive.org/download/jamendo-130684/11-1096032-Dhalius-Hi%20Krokodil.mp3",
+    "spec": "https://archive.org/download/jamendo-130684/11-1096032-Dhalius-Hi%20Krokodil_spectrogram.png",
+    "size": "1.8 MB",
+    "duration": "1:48"
+  },
+  {
+    "name": "Kim Jong",
+    "genre": "Electronica",
+    "mood": "Background",
+    "collection": "jamendo-130684",
+    "url": "https://archive.org/download/jamendo-130684/12-1096033-Dhalius-Kim%20Jong.mp3",
+    "spec": "https://archive.org/download/jamendo-130684/12-1096033-Dhalius-Kim%20Jong_spectrogram.png",
+    "size": "2.1 MB",
+    "duration": "2:02"
+  },
+
+  // ====== Colección: jamendo-151784 (7 tracks) ======
+  {
+    "name": "a movie called life",
+    "genre": "Electronica",
+    "mood": "Background",
+    "collection": "jamendo-151784",
+    "url": "https://archive.org/download/jamendo-151784/01-1270907-Dhalius-a%20movie%20called%20life.mp3",
+    "spec": "https://archive.org/download/jamendo-151784/01-1270907-Dhalius-a%20movie%20called%20life_spectrogram.png",
+    "size": "3.1 MB",
+    "duration": "3:00"
+  },
+  {
+    "name": "cavalier",
+    "genre": "Electronica",
+    "mood": "Background",
+    "collection": "jamendo-151784",
+    "url": "https://archive.org/download/jamendo-151784/02-1270906-Dhalius-cavalier.mp3",
+    "spec": "https://archive.org/download/jamendo-151784/02-1270906-Dhalius-cavalier_spectrogram.png",
+    "size": "2.4 MB",
+    "duration": "2:20"
+  },
+  {
+    "name": "air route",
+    "genre": "Electronica",
+    "mood": "Background",
+    "collection": "jamendo-151784",
+    "url": "https://archive.org/download/jamendo-151784/03-1270904-Dhalius-air%20route.mp3",
+    "spec": "https://archive.org/download/jamendo-151784/03-1270904-Dhalius-air%20route_spectrogram.png",
+    "size": "3.1 MB",
+    "duration": "3:00"
+  },
+  {
+    "name": "v",
+    "genre": "Electronica",
+    "mood": "Background",
+    "collection": "jamendo-151784",
+    "url": "https://archive.org/download/jamendo-151784/04-1270917-Dhalius-v.mp3",
+    "spec": "https://archive.org/download/jamendo-151784/04-1270917-Dhalius-v_spectrogram.png",
+    "size": "2.3 MB",
+    "duration": "2:15"
+  },
+  {
+    "name": "grinder",
+    "genre": "Electronica",
+    "mood": "Background",
+    "collection": "jamendo-151784",
+    "url": "https://archive.org/download/jamendo-151784/05-1270910-Dhalius-grinder.mp3",
+    "spec": "https://archive.org/download/jamendo-151784/05-1270910-Dhalius-grinder_spectrogram.png",
+    "size": "2.7 MB",
+    "duration": "2:35"
+  },
+  {
+    "name": "echo of the past",
+    "genre": "Electronica",
+    "mood": "Background",
+    "collection": "jamendo-151784",
+    "url": "https://archive.org/download/jamendo-151784/06-1270908-Dhalius-echo%20of%20the%20past.mp3",
+    "spec": "https://archive.org/download/jamendo-151784/06-1270908-Dhalius-echo%20of%20the%20past_spectrogram.png",
+    "size": "1.7 MB",
+    "duration": "1:40"
+  },
+  {
+    "name": "clear",
+    "genre": "Electronica",
+    "mood": "Background",
+    "collection": "jamendo-151784",
+    "url": "https://archive.org/download/jamendo-151784/07-1270905-Dhalius-clear.mp3",
+    "spec": "https://archive.org/download/jamendo-151784/07-1270905-Dhalius-clear_spectrogram.png",
+    "size": "953.9 KB",
+    "duration": "0:55"
   }
 ]
