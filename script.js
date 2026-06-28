@@ -348,22 +348,50 @@ videoPlayer.addEventListener('seeked', () => {
 // ============================================================
 // 9. SHOPPING CART
 // ============================================================
+let cart = [];
+const PRICE_PER_TRACK = 0.99;
+
+// DOM del carrito
+const cartBtn = document.getElementById('cartBtn');
+const cartCount = document.getElementById('cartCount');
+const cartView = document.getElementById('cartView');
+const visor = document.getElementById('visor');
+const cartItemsList = document.getElementById('cartItemsList');
+const cartTotalPrice = document.getElementById('cartTotalPrice');
+const cartTotalSection = document.getElementById('cartTotalSection');
+const cartBuyerEmail = document.getElementById('cartBuyerEmail');
+const cartCheckoutBtn = document.getElementById('cartCheckoutBtn');
+const backFromCartBtn = document.getElementById('backFromCartBtn');
+
+// Agregar al carrito
 function addToCart(index) {
     const track = tracks[index];
     if (!track) return;
     if (cart.find(t => t.index === index)) return;
     cart.push({ ...track, index });
     updateCartUI();
+    // Si el carrito está abierto, actualizar la vista
+    if (cartView && cartView.classList.contains('active')) {
+        renderCartView();
+    }
 }
 
+// Quitar del carrito
 function removeFromCart(index) {
     cart = cart.filter(t => t.index !== index);
     updateCartUI();
+    // Si el carrito está abierto, actualizar la vista
+    if (cartView && cartView.classList.contains('active')) {
+        renderCartView();
+    }
 }
 
+// Actualizar UI del carrito (contador y botones)
 function updateCartUI() {
+    // Actualizar contador en la barra superior
     if (cartCount) cartCount.textContent = cart.length;
 
+    // Actualizar botones en la lista de tracks
     document.querySelectorAll('.track-item').forEach((el) => {
         const btn = el.querySelector('.cart-add');
         if (btn) {
@@ -373,18 +401,21 @@ function updateCartUI() {
             btn.classList.toggle('in-cart', isInCart);
         }
     });
-
-    if (cartView && cartView.classList.contains('active')) {
-        renderCartView();
-    }
 }
 
+// Renderizar la vista del carrito
 function renderCartView() {
+    console.log('Renderizando carrito...', cart.length, 'items'); // Debug
+
     const total = cart.length * PRICE_PER_TRACK;
 
     if (cart.length === 0) {
-        cartItemsList.innerHTML = '<div class="empty-cart-msg">Your cart is empty. Add some tracks! 🎵</div>';
-        cartTotalSection.style.display = 'none';
+        if (cartItemsList) {
+            cartItemsList.innerHTML = '<div class="empty-cart-msg">Your cart is empty. Add some tracks! 🎵</div>';
+        }
+        if (cartTotalSection) {
+            cartTotalSection.style.display = 'none';
+        }
         return;
     }
 
@@ -400,11 +431,20 @@ function renderCartView() {
             </div>
         `;
     });
-    cartItemsList.innerHTML = html;
 
-    cartTotalPrice.textContent = `Total: $${total.toFixed(2)} USD`;
-    cartTotalSection.style.display = 'block';
+    if (cartItemsList) {
+        cartItemsList.innerHTML = html;
+    }
 
+    if (cartTotalPrice) {
+        cartTotalPrice.textContent = `Total: $${total.toFixed(2)} USD`;
+    }
+
+    if (cartTotalSection) {
+        cartTotalSection.style.display = 'block';
+    }
+
+    // Event listeners para eliminar items
     document.querySelectorAll('.remove-item-btn').forEach((btn) => {
         btn.addEventListener('click', (e) => {
             const idx = parseInt(e.target.dataset.index);
@@ -412,26 +452,34 @@ function renderCartView() {
             if (trackToRemove) {
                 cart = cart.filter(t => t.index !== trackToRemove.index);
                 updateCartUI();
-                renderCartView();
+                renderCartView(); // Re-renderizar
             }
         });
     });
 }
 
+// Mostrar la vista del carrito
 function showCartView() {
-    visor.style.display = 'none';
-    cartView.classList.add('active');
-    cartView.style.display = 'flex';
-    renderCartView();
+    console.log('Abriendo vista del carrito...'); // Debug
+    if (visor) visor.style.display = 'none';
+    if (cartView) {
+        cartView.classList.add('active');
+        cartView.style.display = 'flex';
+        renderCartView();
+    }
 }
 
+// Ocultar la vista del carrito y mostrar el visor principal
 function hideCartView() {
-    cartView.classList.remove('active');
-    cartView.style.display = 'none';
-    visor.style.display = 'flex';
+    if (cartView) {
+        cartView.classList.remove('active');
+        cartView.style.display = 'none';
+    }
+    if (visor) visor.style.display = 'flex';
 }
 
 // EVENTOS DEL CARRITO
+// Abrir carrito desde el botón superior
 if (cartBtn) {
     cartBtn.addEventListener('click', function(e) {
         e.stopPropagation();
@@ -439,17 +487,19 @@ if (cartBtn) {
     });
 }
 
+// Volver al reproductor
 if (backFromCartBtn) {
     backFromCartBtn.addEventListener('click', function() {
         hideCartView();
     });
 }
 
+// Checkout desde la vista del carrito
 if (cartCheckoutBtn) {
     cartCheckoutBtn.addEventListener('click', function() {
         if (cart.length === 0) return;
 
-        const buyerEmail = cartBuyerEmail.value;
+        const buyerEmail = cartBuyerEmail ? cartBuyerEmail.value : '';
         if (!buyerEmail || !buyerEmail.includes('@')) {
             alert('Please enter a valid email address.');
             return;
@@ -464,7 +514,7 @@ if (cartCheckoutBtn) {
 
         const fields = {
             cmd: '_xclick',
-            business: 'TU_EMAIL@PAYPAL.COM',
+            business: 'TU_EMAIL@PAYPAL.COM', // CAMBIA ESTO
             currency_code: 'USD',
             amount: total.toFixed(2),
             item_name: `Dhalius Tracks (${cart.length} tracks)`,
