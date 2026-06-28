@@ -482,7 +482,11 @@ function removeFromCart(index) {
 }
 
 function updateCartUI() {
-    cartCount.textContent = cart.length;
+    // Actualizar contador
+    const cartCount = document.getElementById('cartCount');
+    if (cartCount) cartCount.textContent = cart.length;
+
+    // Actualizar botones en la lista de tracks
     document.querySelectorAll('.track-item').forEach((el) => {
         const btn = el.querySelector('.cart-add');
         if (btn) {
@@ -492,8 +496,10 @@ function updateCartUI() {
             btn.classList.toggle('in-cart', isInCart);
         }
     });
-    if (cartModal.classList.contains('show')) {
-        renderCartModal();
+
+    // Si la vista del carrito está abierta, re-renderizarla
+    if (cartView.classList.contains('active')) {
+        renderCartView();
     }
 }
 
