@@ -55,7 +55,21 @@
                 <div class="spec-grid" id="specGrid"></div>
             </div>
         </div>
-
+<!-- CART VIEW (reemplaza el visor principal) -->
+<div class="cart-view" id="cartView">
+    <div class="cart-header">
+        <h2>🛒 Your Cart</h2>
+        <button class="back-btn" id="backFromCartBtn">← Back to Player</button>
+    </div>
+    <div class="cart-items-list" id="cartItemsList">
+        <div class="empty-cart-msg">Your cart is empty.</div>
+    </div>
+    <div class="cart-total-section" id="cartTotalSection" style="display:none;">
+        <div class="total-price" id="cartTotalPrice">Total: $0.00 USD</div>
+        <input type="email" class="buyer-email-field" id="cartBuyerEmail" placeholder="📧 Your email for delivery" />
+        <button class="checkout-btn" id="cartCheckoutBtn">Proceed to Checkout →</button>
+    </div>
+</div>
         <!-- player -->
         <div class="player-controls">
             <button id="prevBtn">◀</button>
