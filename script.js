@@ -169,4 +169,383 @@ function loadTrack(index) {
 
     specGrid.innerHTML = `
         <div class="spec-item"><span class="label">Duration</span><span class="value">${track.duration || '—'}</span></div>
-        <div class="
+        <div class="spec-item"><span class="label">Size</span><span class="value">${track.size || '—'}</span></div>
+        <div class="spec-item"><span class="label">Genre</span><span class="value">${track.genre}</span></div>
+        <div class="spec-item"><span class="label">Mood</span><span class="value">${track.mood}</span></div>
+        <div class="spec-item"><span class="label">Collection</span><span class="value">${track.collection}</span></div>
+        <div class="spec-item"><span class="label">Format</span><span class="value">MP3</span></div>
+    `;
+
+    if (track.spec) {
+        spectrogramContainer.innerHTML = `
+            <img class="spectrogram-image" src="${track.spec}" alt="Spectrogram" onerror="this.parentElement.innerHTML='<div class=\\'no-spec\\'>spectrogram not available</div>'" />
+        `;
+    } else {
+        spectrogramContainer.innerHTML = `<div class="no-spec">spectrogram not available</div>`;
+    }
+
+    progressFill.style.width = '0%';
+    timeDisplay.textContent = `0:00 / ${track.duration || '0:00'}`;
+    isPlaying = false;
+    playBtn.textContent = '▶';
+
+    document.querySelectorAll('.track-item').forEach((el, idx) => {
+        const isActive = idx === currentIndex;
+        el.classList.toggle('active', isActive);
+        const indicator = el.querySelector('.tplay-indicator');
+        if (indicator) indicator.textContent = isActive && isPlaying ? '▶' : '';
+    });
+
+    const activeEl = document.querySelector('.track-item.active');
+    if (activeEl) activeEl.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+}
+
+// ============================================================
+// 6. PLAYER CONTROLS
+// ============================================================
+function togglePlay() {
+    if (!audio) {
+        loadTrack(currentIndex);
+        setTimeout(() => togglePlay(), 200);
+        return;
+    }
+    if (isPlaying) {
+        audio.pause();
+        isPlaying = false;
+        playBtn.textContent = '▶';
+        if (videoPlayer.src && !videoPlayer.paused) videoPlayer.pause();
+    } else {
+        audio.play().catch(() => {});
+        isPlaying = true;
+        playBtn.textContent = '⏸';
+        if (videoPlayer.src && videoPlayer.paused) {
+            if (videoPlayer.currentTime === 0 || videoPlayer.currentTime === videoPlayer.duration) {
+                videoPlayer.currentTime = 0;
+            }
+            videoPlayer.play().catch(() => {});
+            videoStatus.textContent = 'synced';
+        }
+    }
+    updatePlayIndicator();
+}
+
+function prevTrack() {
+    const idx = (currentIndex - 1 + tracks.length) % tracks.length;
+    loadTrack(idx);
+    if (isPlaying) audio?.play().catch(() => {});
+}
+
+function nextTrack() {
+    const idx = (currentIndex + 1) % tracks.length;
+    loadTrack(idx);
+    if (isPlaying) audio?.play().catch(() => {});
+}
+
+function updateProgress() {
+    if (!audio || isDragging) return;
+    const pct = (audio.currentTime / audio.duration) * 100 || 0;
+    progressFill.style.width = `${Math.min(pct, 100)}%`;
+    timeDisplay.textContent = `${formatTime(audio.currentTime)} / ${formatTime(audio.duration || 0)}`;
+    if (videoPlayer.src && isPlaying) {
+        const diff = Math.abs(videoPlayer.currentTime - audio.currentTime);
+        if (diff > 0.3) {
+            videoPlayer.currentTime = audio.currentTime;
+        }
+    }
+}
+
+function updatePlayIndicator() {
+    document.querySelectorAll('.track-item').forEach((el, idx) => {
+        const indicator = el.querySelector('.tplay-indicator');
+        if (indicator) indicator.textContent = idx === currentIndex && isPlaying ? '▶' : '';
+    });
+}
+
+// ============================================================
+// 7. SEARCH
+// ============================================================
+searchInput.addEventListener('input', () => {
+    const q = searchInput.value.toLowerCase().trim();
+    filteredTracks = tracks.filter(t =>
+        t.name.toLowerCase().includes(q) ||
+        t.genre.toLowerCase().includes(q) ||
+        t.mood.toLowerCase().includes(q) ||
+        t.collection.toLowerCase().includes(q)
+    );
+    renderSidebar(filteredTracks);
+    if (filteredTracks.length > 0 && !filteredTracks.includes(tracks[currentIndex])) {
+        const newIdx = tracks.indexOf(filteredTracks[0]);
+        if (newIdx > -1) loadTrack(newIdx);
+    }
+});
+
+// ============================================================
+// 8. VIDEO DROP ZONE
+// ============================================================
+dropArea.addEventListener('click', () => fileInput.click());
+
+dropArea.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    dropArea.classList.add('dragover');
+});
+
+dropArea.addEventListener('dragleave', () => {
+    dropArea.classList.remove('dragover');
+});
+
+dropArea.addEventListener('drop', (e) => {
+    e.preventDefault();
+    dropArea.classList.remove('dragover');
+    const files = e.dataTransfer.files;
+    if (files.length > 0) handleVideoFile(files[0]);
+});
+
+fileInput.addEventListener('change', (e) => {
+    if (e.target.files.length > 0) handleVideoFile(e.target.files[0]);
+});
+
+function handleVideoFile(file) {
+    if (file.size > 5 * 1024 * 1024) {
+        alert('Video file is too large. Max size is 5 MB.');
+        return;
+    }
+    if (!file.type.startsWith('video/')) {
+        alert('Please select a video file (MP4, WebM, MOV).');
+        return;
+    }
+
+    if (videoURL) URL.revokeObjectURL(videoURL);
+    videoURL = URL.createObjectURL(file);
+    videoPlayer.src = videoURL;
+    videoPlayer.load();
+    videoWrapper.style.display = 'block';
+    dropArea.style.display = 'none';
+    videoStatus.textContent = 'synced';
+
+    if (isPlaying && audio) {
+        videoPlayer.currentTime = audio.currentTime;
+        videoPlayer.play().catch(() => {});
+    }
+}
+
+removeVideoBtn.addEventListener('click', () => {
+    if (videoURL) {
+        URL.revokeObjectURL(videoURL);
+        videoURL = null;
+    }
+    videoPlayer.src = '';
+    videoPlayer.load();
+    videoWrapper.style.display = 'none';
+    dropArea.style.display = 'flex';
+});
+
+videoPlayer.addEventListener('seeked', () => {
+    if (audio && isPlaying) {
+        audio.currentTime = videoPlayer.currentTime;
+    }
+});
+
+// ============================================================
+// 9. SHOPPING CART
+// ============================================================
+function addToCart(index) {
+    const track = tracks[index];
+    if (!track) return;
+    if (cart.find(t => t.index === index)) return;
+    cart.push({ ...track, index });
+    updateCartUI();
+}
+
+function removeFromCart(index) {
+    cart = cart.filter(t => t.index !== index);
+    updateCartUI();
+}
+
+function updateCartUI() {
+    if (cartCount) cartCount.textContent = cart.length;
+
+    document.querySelectorAll('.track-item').forEach((el) => {
+        const btn = el.querySelector('.cart-add');
+        if (btn) {
+            const idx = parseInt(btn.dataset.index);
+            const isInCart = cart.some(t => t.index === idx);
+            btn.textContent = isInCart ? '✓' : '🛒';
+            btn.classList.toggle('in-cart', isInCart);
+        }
+    });
+
+    if (cartView && cartView.classList.contains('active')) {
+        renderCartView();
+    }
+}
+
+function renderCartView() {
+    const total = cart.length * PRICE_PER_TRACK;
+
+    if (cart.length === 0) {
+        cartItemsList.innerHTML = '<div class="empty-cart-msg">Your cart is empty. Add some tracks! 🎵</div>';
+        cartTotalSection.style.display = 'none';
+        return;
+    }
+
+    let html = '';
+    cart.forEach((track, i) => {
+        html += `
+            <div class="cart-item-row">
+                <span>${track.name}</span>
+                <span>
+                    $${PRICE_PER_TRACK.toFixed(2)}
+                    <button class="remove-item-btn" data-index="${i}">✕</button>
+                </span>
+            </div>
+        `;
+    });
+    cartItemsList.innerHTML = html;
+
+    cartTotalPrice.textContent = `Total: $${total.toFixed(2)} USD`;
+    cartTotalSection.style.display = 'block';
+
+    document.querySelectorAll('.remove-item-btn').forEach((btn) => {
+        btn.addEventListener('click', (e) => {
+            const idx = parseInt(e.target.dataset.index);
+            const trackToRemove = cart[idx];
+            if (trackToRemove) {
+                cart = cart.filter(t => t.index !== trackToRemove.index);
+                updateCartUI();
+                renderCartView();
+            }
+        });
+    });
+}
+
+function showCartView() {
+    visor.style.display = 'none';
+    cartView.classList.add('active');
+    cartView.style.display = 'flex';
+    renderCartView();
+}
+
+function hideCartView() {
+    cartView.classList.remove('active');
+    cartView.style.display = 'none';
+    visor.style.display = 'flex';
+}
+
+// EVENTOS DEL CARRITO
+if (cartBtn) {
+    cartBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        showCartView();
+    });
+}
+
+if (backFromCartBtn) {
+    backFromCartBtn.addEventListener('click', function() {
+        hideCartView();
+    });
+}
+
+if (cartCheckoutBtn) {
+    cartCheckoutBtn.addEventListener('click', function() {
+        if (cart.length === 0) return;
+
+        const buyerEmail = cartBuyerEmail.value;
+        if (!buyerEmail || !buyerEmail.includes('@')) {
+            alert('Please enter a valid email address.');
+            return;
+        }
+
+        const total = cart.length * PRICE_PER_TRACK;
+        const itemList = cart.map(t => t.name).join('\n');
+
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = 'https://www.paypal.com/cgi-bin/webscr';
+
+        const fields = {
+            cmd: '_xclick',
+            business: 'TU_EMAIL@PAYPAL.COM',
+            currency_code: 'USD',
+            amount: total.toFixed(2),
+            item_name: `Dhalius Tracks (${cart.length} tracks)`,
+            item_number: 'Dhalius_CR_' + Date.now(),
+            quantity: '1',
+            return: 'https://tu-sitio.com/gracias',
+            cancel_return: 'https://tu-sitio.com/cancelado',
+            custom: buyerEmail,
+            on0: 'Tracks',
+            os0: itemList
+        };
+
+        for (const [key, value] of Object.entries(fields)) {
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = key;
+            input.value = value;
+            form.appendChild(input);
+        }
+
+        document.body.appendChild(form);
+        form.submit();
+    });
+}
+
+// ============================================================
+// 10. EVENTS
+// ============================================================
+playBtn.addEventListener('click', togglePlay);
+prevBtn.addEventListener('click', prevTrack);
+nextBtn.addEventListener('click', nextTrack);
+downloadBtn.addEventListener('click', () => {
+    if (tracks[currentIndex]) window.open(tracks[currentIndex].url, '_blank');
+});
+
+document.addEventListener('keydown', (e) => {
+    if (e.target.tagName === 'INPUT') return;
+    if (e.code === 'Space') { e.preventDefault(); togglePlay(); }
+    if (e.code === 'ArrowRight') nextTrack();
+    if (e.code === 'ArrowLeft') prevTrack();
+});
+
+progressWrap.addEventListener('mousedown', (e) => {
+    if (!audio) return;
+    isDragging = true;
+    const rect = progressWrap.getBoundingClientRect();
+    const pct = Math.min(Math.max((e.clientX - rect.left) / rect.width, 0), 1);
+    const time = pct * audio.duration;
+    audio.currentTime = time;
+    progressFill.style.width = `${pct * 100}%`;
+    timeDisplay.textContent = `${formatTime(time)} / ${formatTime(audio.duration || 0)}`;
+    if (videoPlayer.src) videoPlayer.currentTime = time;
+});
+
+window.addEventListener('mousemove', (e) => {
+    if (!isDragging || !audio) return;
+    const rect = progressWrap.getBoundingClientRect();
+    const pct = Math.min(Math.max((e.clientX - rect.left) / rect.width, 0), 1);
+    const time = pct * audio.duration;
+    audio.currentTime = time;
+    progressFill.style.width = `${pct * 100}%`;
+    timeDisplay.textContent = `${formatTime(time)} / ${formatTime(audio.duration || 0)}`;
+    if (videoPlayer.src) videoPlayer.currentTime = time;
+});
+
+window.addEventListener('mouseup', () => { isDragging = false; });
+
+mobileToggle.addEventListener('click', () => {
+    sidebar.classList.toggle('open');
+});
+
+document.addEventListener('click', (e) => {
+    if (window.innerWidth <= 480) {
+        if (!sidebar.contains(e.target) && e.target !== mobileToggle) {
+            sidebar.classList.remove('open');
+        }
+    }
+});
+
+// ============================================================
+// 11. INIT
+// ============================================================
+loadTracks();
+console.log('🎛️ Dhalius Control Room v2.0 loaded — video sync + cart ready.');
