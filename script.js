@@ -43,14 +43,13 @@ const videoStatus = document.getElementById('videoStatus');
 // Cart elements
 const cartBtn = document.getElementById('cartBtn');
 const cartCount = document.getElementById('cartCount');
-const cartView = document.getElementById('cartView');
-const visor = document.getElementById('visor');
-const cartItemsList = document.getElementById('cartItemsList');
-const cartTotalPrice = document.getElementById('cartTotalPrice');
-const cartTotalSection = document.getElementById('cartTotalSection');
-const cartBuyerEmail = document.getElementById('cartBuyerEmail');
-const cartCheckoutBtn = document.getElementById('cartCheckoutBtn');
-const backFromCartBtn = document.getElementById('backFromCartBtn');
+const cartModal = document.getElementById('cartModal');
+const closeCartBtn = document.getElementById('closeCartBtn');
+const cartItems = document.getElementById('cartItems');
+const cartTotal = document.getElementById('cartTotal');
+const checkoutBtn = document.getElementById('checkoutBtn');
+const buyerEmailInput = document.getElementById('buyerEmailInput');
+const buyerEmailSection = document.getElementById('buyerEmailSection');
 
 // ============================================================
 // 2. FORMAT HELPERS
@@ -348,50 +347,21 @@ videoPlayer.addEventListener('seeked', () => {
 // ============================================================
 // 9. SHOPPING CART
 // ============================================================
-let cart = [];
-const PRICE_PER_TRACK = 0.99;
-
-// DOM del carrito
-const cartBtn = document.getElementById('cartBtn');
-const cartCount = document.getElementById('cartCount');
-const cartView = document.getElementById('cartView');
-const visor = document.getElementById('visor');
-const cartItemsList = document.getElementById('cartItemsList');
-const cartTotalPrice = document.getElementById('cartTotalPrice');
-const cartTotalSection = document.getElementById('cartTotalSection');
-const cartBuyerEmail = document.getElementById('cartBuyerEmail');
-const cartCheckoutBtn = document.getElementById('cartCheckoutBtn');
-const backFromCartBtn = document.getElementById('backFromCartBtn');
-
-// Agregar al carrito
 function addToCart(index) {
     const track = tracks[index];
     if (!track) return;
     if (cart.find(t => t.index === index)) return;
     cart.push({ ...track, index });
     updateCartUI();
-    // Si el carrito está abierto, actualizar la vista
-    if (cartView && cartView.classList.contains('active')) {
-        renderCartView();
-    }
 }
 
-// Quitar del carrito
 function removeFromCart(index) {
     cart = cart.filter(t => t.index !== index);
     updateCartUI();
-    // Si el carrito está abierto, actualizar la vista
-    if (cartView && cartView.classList.contains('active')) {
-        renderCartView();
-    }
 }
 
-// Actualizar UI del carrito (contador y botones)
 function updateCartUI() {
-    // Actualizar contador en la barra superior
-    if (cartCount) cartCount.textContent = cart.length;
-
-    // Actualizar botones en la lista de tracks
+    cartCount.textContent = cart.length;
     document.querySelectorAll('.track-item').forEach((el) => {
         const btn = el.querySelector('.cart-add');
         if (btn) {
@@ -401,144 +371,108 @@ function updateCartUI() {
             btn.classList.toggle('in-cart', isInCart);
         }
     });
+    if (cartModal.classList.contains('show')) {
+        renderCartModal();
+    }
 }
 
-// Renderizar la vista del carrito
-function renderCartView() {
-    console.log('Renderizando carrito...', cart.length, 'items'); // Debug
-
+function renderCartModal() {
     const total = cart.length * PRICE_PER_TRACK;
 
     if (cart.length === 0) {
-        if (cartItemsList) {
-            cartItemsList.innerHTML = '<div class="empty-cart-msg">Your cart is empty. Add some tracks! 🎵</div>';
-        }
-        if (cartTotalSection) {
-            cartTotalSection.style.display = 'none';
-        }
+        cartItems.innerHTML = '<div style="color:#4a4a5a;font-size:0.8rem;">Your cart is empty.</div>';
+        cartTotal.textContent = 'Total: $0.00 USD';
+        checkoutBtn.style.display = 'none';
+        buyerEmailSection.style.display = 'none';
         return;
     }
 
     let html = '';
     cart.forEach((track, i) => {
         html += `
-            <div class="cart-item-row">
+            <div class="cart-item">
                 <span>${track.name}</span>
                 <span>
                     $${PRICE_PER_TRACK.toFixed(2)}
-                    <button class="remove-item-btn" data-index="${i}">✕</button>
+                    <button class="remove-item" data-index="${i}">✕</button>
                 </span>
             </div>
         `;
     });
+    cartItems.innerHTML = html;
 
-    if (cartItemsList) {
-        cartItemsList.innerHTML = html;
-    }
+    cartTotal.textContent = `Total: $${total.toFixed(2)} USD`;
+    checkoutBtn.style.display = 'block';
+    buyerEmailSection.style.display = 'block';
 
-    if (cartTotalPrice) {
-        cartTotalPrice.textContent = `Total: $${total.toFixed(2)} USD`;
-    }
-
-    if (cartTotalSection) {
-        cartTotalSection.style.display = 'block';
-    }
-
-    // Event listeners para eliminar items
-    document.querySelectorAll('.remove-item-btn').forEach((btn) => {
+    document.querySelectorAll('.remove-item').forEach((btn) => {
         btn.addEventListener('click', (e) => {
             const idx = parseInt(e.target.dataset.index);
             const trackToRemove = cart[idx];
             if (trackToRemove) {
                 cart = cart.filter(t => t.index !== trackToRemove.index);
                 updateCartUI();
-                renderCartView(); // Re-renderizar
             }
         });
     });
 }
 
-// Mostrar la vista del carrito
-function showCartView() {
-    console.log('Abriendo vista del carrito...'); // Debug
-    if (visor) visor.style.display = 'none';
-    if (cartView) {
-        cartView.classList.add('active');
-        cartView.style.display = 'flex';
-        renderCartView();
+// Cart events
+cartBtn.addEventListener('click', () => {
+    cartModal.classList.toggle('show');
+    renderCartModal();
+});
+
+closeCartBtn.addEventListener('click', () => {
+    cartModal.classList.remove('show');
+});
+
+cartModal.addEventListener('click', (e) => {
+    if (e.target === cartModal) cartModal.classList.remove('show');
+});
+
+checkoutBtn.addEventListener('click', () => {
+    if (cart.length === 0) return;
+
+    const buyerEmail = buyerEmailInput.value;
+    if (!buyerEmail || !buyerEmail.includes('@')) {
+        alert('Please enter a valid email address.');
+        return;
     }
-}
 
-// Ocultar la vista del carrito y mostrar el visor principal
-function hideCartView() {
-    if (cartView) {
-        cartView.classList.remove('active');
-        cartView.style.display = 'none';
+    const total = cart.length * PRICE_PER_TRACK;
+    const itemList = cart.map(t => t.name).join('\n');
+
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = 'https://www.paypal.com/cgi-bin/webscr';
+
+    const fields = {
+        cmd: '_xclick',
+        business: 'TU_EMAIL@PAYPAL.COM',
+        currency_code: 'USD',
+        amount: total.toFixed(2),
+        item_name: `Dhalius Tracks (${cart.length} tracks)`,
+        item_number: 'Dhalius_CR_' + Date.now(),
+        quantity: '1',
+        return: 'https://tu-sitio.com/gracias',
+        cancel_return: 'https://tu-sitio.com/cancelado',
+        custom: buyerEmail,
+        on0: 'Tracks',
+        os0: itemList
+    };
+
+    for (const [key, value] of Object.entries(fields)) {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = key;
+        input.value = value;
+        form.appendChild(input);
     }
-    if (visor) visor.style.display = 'flex';
-}
 
-// EVENTOS DEL CARRITO
-// Abrir carrito desde el botón superior
-if (cartBtn) {
-    cartBtn.addEventListener('click', function(e) {
-        e.stopPropagation();
-        showCartView();
-    });
-}
-
-// Volver al reproductor
-if (backFromCartBtn) {
-    backFromCartBtn.addEventListener('click', function() {
-        hideCartView();
-    });
-}
-
-// Checkout desde la vista del carrito
-if (cartCheckoutBtn) {
-    cartCheckoutBtn.addEventListener('click', function() {
-        if (cart.length === 0) return;
-
-        const buyerEmail = cartBuyerEmail ? cartBuyerEmail.value : '';
-        if (!buyerEmail || !buyerEmail.includes('@')) {
-            alert('Please enter a valid email address.');
-            return;
-        }
-
-        const total = cart.length * PRICE_PER_TRACK;
-        const itemList = cart.map(t => t.name).join('\n');
-
-        const form = document.createElement('form');
-        form.method = 'POST';
-        form.action = 'https://www.paypal.com/cgi-bin/webscr';
-
-        const fields = {
-            cmd: '_xclick',
-            business: 'TU_EMAIL@PAYPAL.COM', // CAMBIA ESTO
-            currency_code: 'USD',
-            amount: total.toFixed(2),
-            item_name: `Dhalius Tracks (${cart.length} tracks)`,
-            item_number: 'Dhalius_CR_' + Date.now(),
-            quantity: '1',
-            return: 'https://tu-sitio.com/gracias',
-            cancel_return: 'https://tu-sitio.com/cancelado',
-            custom: buyerEmail,
-            on0: 'Tracks',
-            os0: itemList
-        };
-
-        for (const [key, value] of Object.entries(fields)) {
-            const input = document.createElement('input');
-            input.type = 'hidden';
-            input.name = key;
-            input.value = value;
-            form.appendChild(input);
-        }
-
-        document.body.appendChild(form);
-        form.submit();
-    });
-}
+    document.body.appendChild(form);
+    form.submit();
+});
 
 // ============================================================
 // 10. EVENTS
