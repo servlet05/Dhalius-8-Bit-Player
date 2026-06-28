@@ -55,21 +55,7 @@
                 <div class="spec-grid" id="specGrid"></div>
             </div>
         </div>
-<!-- CART VIEW (reemplaza el visor principal) -->
-<div class="cart-view" id="cartView">
-    <div class="cart-header">
-        <h2>🛒 Your Cart</h2>
-        <button class="back-btn" id="backFromCartBtn">← Back to Player</button>
-    </div>
-    <div class="cart-items-list" id="cartItemsList">
-        <div class="empty-cart-msg">Your cart is empty.</div>
-    </div>
-    <div class="cart-total-section" id="cartTotalSection" style="display:none;">
-        <div class="total-price" id="cartTotalPrice">Total: $0.00 USD</div>
-        <input type="email" class="buyer-email-field" id="cartBuyerEmail" placeholder="📧 Your email for delivery" />
-        <button class="checkout-btn" id="cartCheckoutBtn">Proceed to Checkout →</button>
-    </div>
-</div>
+
         <!-- player -->
         <div class="player-controls">
             <button id="prevBtn">◀</button>
@@ -111,39 +97,22 @@
                 <button class="remove-btn" id="removeVideoBtn">✕ remove</button>
             </div>
         </div>
-    </div>
-</div>
 
-<!-- CART MODAL -->
-<div id="cartModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);z-index:9999;justify-content:center;align-items:center;backdrop-filter:blur(4px);">
-    <div style="background:#0f0f18;border:1px solid #2a2a3a;border-radius:16px;padding:30px;max-width:500px;width:90%;max-height:80vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.8);">
-
-        <!-- HEADER -->
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
-            <h2 style="font-size:1.2rem;font-weight:400;color:#f0f0f0;">🛒 Your Cart</h2>
-            <button id="closeCartBtn" style="background:none;border:none;color:#6a6a7a;font-size:1.6rem;cursor:pointer;transition:0.2s;" onmouseover="this.style.color='#f0f0f0'" onmouseout="this.style.color='#6a6a7a'">✕</button>
+        <!-- CART VIEW (reemplaza el visor principal) -->
+        <div class="cart-view" id="cartView">
+            <div class="cart-header">
+                <h2>🛒 Your Cart</h2>
+                <button class="back-btn" id="backFromCartBtn">← Back to Player</button>
+            </div>
+            <div class="cart-items-list" id="cartItemsList">
+                <div class="empty-cart-msg">Your cart is empty.</div>
+            </div>
+            <div class="cart-total-section" id="cartTotalSection" style="display:none;">
+                <div class="total-price" id="cartTotalPrice">Total: $0.00 USD</div>
+                <input type="email" class="buyer-email-field" id="cartBuyerEmail" placeholder="📧 Your email for delivery" />
+                <button class="checkout-btn" id="cartCheckoutBtn">Proceed to Checkout →</button>
+            </div>
         </div>
-
-        <!-- LISTA DE ITEMS -->
-        <div id="cartItems" style="margin-bottom:16px;font-size:0.85rem;color:#aaa;min-height:60px;">
-            <div style="color:#4a4a5a;font-size:0.8rem;">Your cart is empty.</div>
-        </div>
-
-        <!-- FORMULARIO PARA CORREO -->
-        <div id="buyerEmailSection" style="margin-bottom:16px;display:none;">
-            <label style="font-size:0.7rem;color:#6a6a7a;display:block;margin-bottom:4px;letter-spacing:0.5px;">📧 YOUR EMAIL (for delivery)</label>
-            <input type="email" id="buyerEmailInput" placeholder="you@example.com" style="width:100%;background:#1a1a2a;border:1px solid #2a2a3a;color:#e0e0e0;padding:10px 14px;border-radius:8px;font-family:'Inter',sans-serif;font-size:0.85rem;outline:none;transition:0.2s;" onfocus="this.style.borderColor='#5a5a8a'" onblur="this.style.borderColor='#2a2a3a'" />
-        </div>
-
-        <!-- TOTAL -->
-        <div id="cartTotal" style="font-size:1rem;font-weight:600;border-top:1px solid #1a1a2a;padding-top:14px;margin-bottom:16px;color:#f0f0f0;">
-            Total: $0.00 USD
-        </div>
-
-        <!-- BOTÓN DE PAGO -->
-        <button id="checkoutBtn" style="width:100%;background:#3a3a5a;border:1px solid #4a4a6a;color:#f0f0f0;padding:14px;border-radius:8px;font-size:1rem;cursor:pointer;font-family:'Inter',sans-serif;transition:0.2s;display:none;" onmouseover="this.style.background='#5a5a8a'" onmouseout="this.style.background='#3a3a5a'">
-            Proceed to Checkout →
-        </button>
     </div>
 </div>
 
