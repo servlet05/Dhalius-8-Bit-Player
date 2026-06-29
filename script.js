@@ -317,14 +317,27 @@ function handleVideoFile(file) {
     videoURL = URL.createObjectURL(file);
     videoPlayer.src = videoURL;
     videoPlayer.load();
+
+    // 🔇 1. El video empieza silenciado para evitar ruido al cargar.
+    videoPlayer.muted = true;
+
     videoWrapper.style.display = 'block';
     dropArea.style.display = 'none';
     videoStatus.textContent = 'synced';
 
+    // Si el audio ya estaba sonando, sincroniza el video.
     if (isPlaying && audio) {
         videoPlayer.currentTime = audio.currentTime;
         videoPlayer.play().catch(() => {});
     }
+
+    // 👆 2. Este es el truco: cuando el usuario haga clic en cualquier parte del video, se activa el sonido.
+    videoPlayer.addEventListener('click', () => {
+        if (videoPlayer.muted) {
+            videoPlayer.muted = false;
+            videoStatus.textContent = 'unmuted';
+        }
+    });
 }
 
 removeVideoBtn.addEventListener('click', () => {
@@ -336,12 +349,6 @@ removeVideoBtn.addEventListener('click', () => {
     videoPlayer.load();
     videoWrapper.style.display = 'none';
     dropArea.style.display = 'flex';
-});
-
-videoPlayer.addEventListener('seeked', () => {
-    if (audio && isPlaying) {
-        audio.currentTime = videoPlayer.currentTime;
-    }
 });
 
 // ============================================================
