@@ -242,13 +242,31 @@ function nextTrack() {
 
 function updateProgress() {
     if (!audio || isDragging) return;
+
+    // Actualizar la barra de progreso del audio
     const pct = (audio.currentTime / audio.duration) * 100 || 0;
     progressFill.style.width = `${Math.min(pct, 100)}%`;
     timeDisplay.textContent = `${formatTime(audio.currentTime)} / ${formatTime(audio.duration || 0)}`;
+
+    // --- Sincronización del video (corregida) ---
     if (videoPlayer.src && isPlaying) {
+        // 1. Si el video se ha atascado o está muy desincronizado, lo corregimos.
         const diff = Math.abs(videoPlayer.currentTime - audio.currentTime);
-        if (diff > 0.3) {
-            videoPlayer.currentTime = audio.currentTime;
+
+        // Si la diferencia es mayor a 0.3 segundos o el video está "atascado" (pausado sin motivo),
+        // forzamos la sincronización.
+        if (diff > 0.3 || (videoPlayer.paused && !videoPlayer.ended)) {
+            // 📌 3. Crucial: Asegurarse de que el tiempo que le pedimos al video exista.
+            // Si el audio está más avanzado que el video, pero el audio ya pasó la duración del video,
+            // evitamos que se desincronice o se atasque.
+            if (audio.currentTime < videoPlayer.duration) {
+                videoPlayer.currentTime = audio.currentTime;
+            } else {
+                // Si el audio ya superó la duración del video, pausamos el video al final.
+                videoPlayer.currentTime = videoPlayer.duration;
+                videoPlayer.pause();
+                videoStatus.textContent = 'video ended';
+            }
         }
     }
 }
