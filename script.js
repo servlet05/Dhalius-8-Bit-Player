@@ -9,8 +9,6 @@ let isDragging = false;
 let filteredTracks = [];
 let videoFile = null;
 let videoURL = null;
-let cart = [];
-const PRICE_PER_TRACK = 0.99;
 
 // DOM
 const trackListEl = document.getElementById('trackList');
@@ -39,17 +37,6 @@ const videoWrapper = document.getElementById('videoWrapper');
 const videoPlayer = document.getElementById('videoPlayer');
 const removeVideoBtn = document.getElementById('removeVideoBtn');
 const videoStatus = document.getElementById('videoStatus');
-
-// Cart elements
-const cartBtn = document.getElementById('cartBtn');
-const cartCount = document.getElementById('cartCount');
-const cartModal = document.getElementById('cartModal');
-const closeCartBtn = document.getElementById('closeCartBtn');
-const cartItems = document.getElementById('cartItems');
-const cartTotal = document.getElementById('cartTotal');
-const checkoutBtn = document.getElementById('checkoutBtn');
-const buyerEmailInput = document.getElementById('buyerEmailInput');
-const buyerEmailSection = document.getElementById('buyerEmailSection');
 
 // ============================================================
 // 2. FORMAT HELPERS
@@ -93,7 +80,6 @@ function renderSidebar(list) {
         const isActive = idx === currentIndex && tracks.indexOf(track) === currentIndex;
         div.className = 'track-item' + (isActive ? ' active' : '');
         const num = tracks.indexOf(track) + 1;
-        const isInCart = cart.some(t => t.index === tracks.indexOf(track));
         div.innerHTML = `
             <span class="tnum">${num}</span>
             <div class="tinfo">
@@ -101,24 +87,12 @@ function renderSidebar(list) {
                 <div class="tmeta">${track.genre} · ${track.collection}</div>
             </div>
             <span class="tbadge">${track.duration || '--'}</span>
-            <button class="cart-add ${isInCart ? 'in-cart' : ''}" data-index="${tracks.indexOf(track)}">${isInCart ? '✓' : '🛒'}</button>
             <span class="tplay-indicator">${isActive && isPlaying ? '▶' : ''}</span>
         `;
         div.addEventListener('click', (e) => {
-            if (e.target.closest('.cart-add')) return;
             const realIdx = tracks.indexOf(track);
             if (realIdx > -1) loadTrack(realIdx);
             if (window.innerWidth <= 480) sidebar.classList.remove('open');
-        });
-        const btn = div.querySelector('.cart-add');
-        btn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            const idx = parseInt(e.target.dataset.index);
-            if (cart.some(t => t.index === idx)) {
-                removeFromCart(idx);
-            } else {
-                addToCart(idx);
-            }
         });
         trackListEl.appendChild(div);
     });
@@ -243,26 +217,16 @@ function nextTrack() {
 function updateProgress() {
     if (!audio || isDragging) return;
 
-    // Actualizar la barra de progreso del audio
     const pct = (audio.currentTime / audio.duration) * 100 || 0;
     progressFill.style.width = `${Math.min(pct, 100)}%`;
     timeDisplay.textContent = `${formatTime(audio.currentTime)} / ${formatTime(audio.duration || 0)}`;
 
-    // --- Sincronización del video (corregida) ---
     if (videoPlayer.src && isPlaying) {
-        // 1. Si el video se ha atascado o está muy desincronizado, lo corregimos.
         const diff = Math.abs(videoPlayer.currentTime - audio.currentTime);
-
-        // Si la diferencia es mayor a 0.3 segundos o el video está "atascado" (pausado sin motivo),
-        // forzamos la sincronización.
         if (diff > 0.3 || (videoPlayer.paused && !videoPlayer.ended)) {
-            // 📌 3. Crucial: Asegurarse de que el tiempo que le pedimos al video exista.
-            // Si el audio está más avanzado que el video, pero el audio ya pasó la duración del video,
-            // evitamos que se desincronice o se atasque.
             if (audio.currentTime < videoPlayer.duration) {
                 videoPlayer.currentTime = audio.currentTime;
             } else {
-                // Si el audio ya superó la duración del video, pausamos el video al final.
                 videoPlayer.currentTime = videoPlayer.duration;
                 videoPlayer.pause();
                 videoStatus.textContent = 'video ended';
@@ -336,20 +300,17 @@ function handleVideoFile(file) {
     videoPlayer.src = videoURL;
     videoPlayer.load();
 
-    // 🔇 1. El video empieza silenciado para evitar ruido al cargar.
     videoPlayer.muted = true;
 
     videoWrapper.style.display = 'block';
     dropArea.style.display = 'none';
     videoStatus.textContent = 'synced';
 
-    // Si el audio ya estaba sonando, sincroniza el video.
     if (isPlaying && audio) {
         videoPlayer.currentTime = audio.currentTime;
         videoPlayer.play().catch(() => {});
     }
 
-    // 👆 2. Este es el truco: cuando el usuario haga clic en cualquier parte del video, se activa el sonido.
     videoPlayer.addEventListener('click', () => {
         if (videoPlayer.muted) {
             videoPlayer.muted = false;
@@ -370,137 +331,7 @@ removeVideoBtn.addEventListener('click', () => {
 });
 
 // ============================================================
-// 9. SHOPPING CART
-// ============================================================
-function addToCart(index) {
-    const track = tracks[index];
-    if (!track) return;
-    if (cart.find(t => t.index === index)) return;
-    cart.push({ ...track, index });
-    updateCartUI();
-}
-
-function removeFromCart(index) {
-    cart = cart.filter(t => t.index !== index);
-    updateCartUI();
-}
-
-function updateCartUI() {
-    cartCount.textContent = cart.length;
-    document.querySelectorAll('.track-item').forEach((el) => {
-        const btn = el.querySelector('.cart-add');
-        if (btn) {
-            const idx = parseInt(btn.dataset.index);
-            const isInCart = cart.some(t => t.index === idx);
-            btn.textContent = isInCart ? '✓' : '🛒';
-            btn.classList.toggle('in-cart', isInCart);
-        }
-    });
-    if (cartModal.classList.contains('show')) {
-        renderCartModal();
-    }
-}
-
-function renderCartModal() {
-    const total = cart.length * PRICE_PER_TRACK;
-
-    if (cart.length === 0) {
-        cartItems.innerHTML = '<div style="color:#4a4a5a;font-size:0.8rem;">Your cart is empty.</div>';
-        cartTotal.textContent = 'Total: $0.00 USD';
-        checkoutBtn.style.display = 'none';
-        buyerEmailSection.style.display = 'none';
-        return;
-    }
-
-    let html = '';
-    cart.forEach((track, i) => {
-        html += `
-            <div class="cart-item">
-                <span>${track.name}</span>
-                <span>
-                    $${PRICE_PER_TRACK.toFixed(2)}
-                    <button class="remove-item" data-index="${i}">✕</button>
-                </span>
-            </div>
-        `;
-    });
-    cartItems.innerHTML = html;
-
-    cartTotal.textContent = `Total: $${total.toFixed(2)} USD`;
-    checkoutBtn.style.display = 'block';
-    buyerEmailSection.style.display = 'block';
-
-    document.querySelectorAll('.remove-item').forEach((btn) => {
-        btn.addEventListener('click', (e) => {
-            const idx = parseInt(e.target.dataset.index);
-            const trackToRemove = cart[idx];
-            if (trackToRemove) {
-                cart = cart.filter(t => t.index !== trackToRemove.index);
-                updateCartUI();
-            }
-        });
-    });
-}
-
-// Cart events
-cartBtn.addEventListener('click', () => {
-    cartModal.classList.toggle('show');
-    renderCartModal();
-});
-
-closeCartBtn.addEventListener('click', () => {
-    cartModal.classList.remove('show');
-});
-
-cartModal.addEventListener('click', (e) => {
-    if (e.target === cartModal) cartModal.classList.remove('show');
-});
-
-checkoutBtn.addEventListener('click', () => {
-    if (cart.length === 0) return;
-
-    const buyerEmail = buyerEmailInput.value;
-    if (!buyerEmail || !buyerEmail.includes('@')) {
-        alert('Please enter a valid email address.');
-        return;
-    }
-
-    const total = cart.length * PRICE_PER_TRACK;
-    const itemList = cart.map(t => t.name).join('\n');
-
-    const form = document.createElement('form');
-    form.method = 'POST';
-    form.action = 'https://www.paypal.com/cgi-bin/webscr';
-
-    const fields = {
-        cmd: '_xclick',
-        business: 'TU_EMAIL@PAYPAL.COM',
-        currency_code: 'USD',
-        amount: total.toFixed(2),
-        item_name: `Dhalius Tracks (${cart.length} tracks)`,
-        item_number: 'Dhalius_CR_' + Date.now(),
-        quantity: '1',
-        return: 'https://tu-sitio.com/gracias',
-        cancel_return: 'https://tu-sitio.com/cancelado',
-        custom: buyerEmail,
-        on0: 'Tracks',
-        os0: itemList
-    };
-
-    for (const [key, value] of Object.entries(fields)) {
-        const input = document.createElement('input');
-        input.type = 'hidden';
-        input.name = key;
-        input.value = value;
-        form.appendChild(input);
-    }
-
-    document.body.appendChild(form);
-    form.submit();
-});
-
-// ============================================================
-// 10. EVENTS
+// 9. EVENTS
 // ============================================================
 playBtn.addEventListener('click', togglePlay);
 prevBtn.addEventListener('click', prevTrack);
@@ -554,7 +385,7 @@ document.addEventListener('click', (e) => {
 });
 
 // ============================================================
-// 11. INIT
+// 10. INIT
 // ============================================================
 loadTracks();
-console.log('🎛️ Dhalius Control Room v2.0 loaded — video sync + cart ready.');
+console.log('🎛️ Dhalius Control Room v2.0 loaded — video sync ready.');
