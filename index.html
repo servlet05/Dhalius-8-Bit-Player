@@ -97,53 +97,42 @@
                 <button class="remove-btn" id="removeVideoBtn">✕ remove</button>
             </div>
         </div>
-
-        <!-- PAYPAL BUTTON -->
-        <div style="text-align:center;margin-top:16px;padding:12px;background:#0f0f18;border-radius:12px;border:1px solid #1a1a2a;">
-            <p style="font-size:0.65rem;color:#5a5a6a;margin-bottom:6px;letter-spacing:0.5px;">💿 APOYA EL PROYECTO · $0.99 USD</p>
-            <div id="paypal-container-8CYDUZQGEGGGE"></div>
-        </div>
     </div>
 </div>
 
-<!-- PAYPAL SDK -->
-<script 
-  src="https://www.paypal.com/sdk/js?client-id=BAA6Xp_zWSE3q82mRzZUOi6crpvzOJvd943vA19lYydMml22T6jcQAE0zBMWS4iDIiMrCkGA1IKMKT8jhQ&components=hosted-buttons&disable-funding=venmo&currency=USD">
-</script>
+<!-- CART MODAL -->
+<div id="cartModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);z-index:9999;justify-content:center;align-items:center;backdrop-filter:blur(4px);">
+    <div style="background:#0f0f18;border:1px solid #2a2a3a;border-radius:16px;padding:30px;max-width:500px;width:90%;max-height:80vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.8);">
+
+        <!-- HEADER -->
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+            <h2 style="font-size:1.2rem;font-weight:400;color:#f0f0f0;">🛒 Your Cart</h2>
+            <button id="closeCartBtn" style="background:none;border:none;color:#6a6a7a;font-size:1.6rem;cursor:pointer;transition:0.2s;" onmouseover="this.style.color='#f0f0f0'" onmouseout="this.style.color='#6a6a7a'">✕</button>
+        </div>
+
+        <!-- LISTA DE ITEMS -->
+        <div id="cartItems" style="margin-bottom:16px;font-size:0.85rem;color:#aaa;min-height:60px;">
+            <div style="color:#4a4a5a;font-size:0.8rem;">Your cart is empty.</div>
+        </div>
+
+        <!-- FORMULARIO PARA CORREO -->
+        <div id="buyerEmailSection" style="margin-bottom:16px;display:none;">
+            <label style="font-size:0.7rem;color:#6a6a7a;display:block;margin-bottom:4px;letter-spacing:0.5px;">📧 YOUR EMAIL (for delivery)</label>
+            <input type="email" id="buyerEmailInput" placeholder="you@example.com" style="width:100%;background:#1a1a2a;border:1px solid #2a2a3a;color:#e0e0e0;padding:10px 14px;border-radius:8px;font-family:'Inter',sans-serif;font-size:0.85rem;outline:none;transition:0.2s;" onfocus="this.style.borderColor='#5a5a8a'" onblur="this.style.borderColor='#2a2a3a'" />
+        </div>
+
+        <!-- TOTAL -->
+        <div id="cartTotal" style="font-size:1rem;font-weight:600;border-top:1px solid #1a1a2a;padding-top:14px;margin-bottom:16px;color:#f0f0f0;">
+            Total: $0.00 USD
+        </div>
+
+        <!-- BOTÓN DE PAGO -->
+        <button id="checkoutBtn" style="width:100%;background:#3a3a5a;border:1px solid #4a4a6a;color:#f0f0f0;padding:14px;border-radius:8px;font-size:1rem;cursor:pointer;font-family:'Inter',sans-serif;transition:0.2s;display:none;" onmouseover="this.style.background='#5a5a8a'" onmouseout="this.style.background='#3a3a5a'">
+            Proceed to Checkout →
+        </button>
+    </div>
+</div>
 
 <script src="script.js"></script>
-<!-- PAYPAL SDK (después de script.js) -->
-<script 
-  src="https://www.paypal.com/sdk/js?client-id=BAA6Xp_zWSE3q82mRzZUOi6crpvzOJvd943vA19lYydMml22T6jcQAE0zBMWS4iDIiMrCkGA1IKMKT8jhQ&components=hosted-buttons&disable-funding=venmo&currency=USD">
-</script>
-<script>
-    // ============================================================
-    // PAYPAL BUTTON RENDER
-    // ============================================================
-    // Esperar a que el DOM esté listo y el SDK cargado
-    document.addEventListener('DOMContentLoaded', function() {
-        if (typeof paypal !== 'undefined' && paypal.HostedButtons) {
-            paypal.HostedButtons({
-                hostedButtonId: "8CYDUZQGEGGGE",
-            }).render("#paypal-container-8CYDUZQGEGGGE");
-        } else {
-            console.warn('PayPal SDK not loaded yet.');
-        }
-    });
-
-    // Fallback: Si el SDK carga después del DOMContentLoaded
-    setTimeout(function() {
-        if (typeof paypal !== 'undefined' && paypal.HostedButtons) {
-            try {
-                paypal.HostedButtons({
-                    hostedButtonId: "8CYDUZQGEGGGE",
-                }).render("#paypal-container-8CYDUZQGEGGGE");
-            } catch(e) {
-                console.warn('PayPal render fallback:', e);
-            }
-        }
-    }, 2000);
-</script>
-
 </body>
 </html>
